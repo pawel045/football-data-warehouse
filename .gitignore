@@ -1,0 +1,4 @@
+__pycache__
+.idea
+etl/airflow_football_key.ppk
+etl/my_secret_key.py

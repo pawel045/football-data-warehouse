@@ -1,9 +1,42 @@
+import boto3
 import numpy as np
-from my_secret_key import SECRET_KEY
+from my_secret_key import *
 import pandas as pd
 import requests
+import s3fs
 
 pd.set_option('mode.chained_assignment', None)
+
+
+def create_initial_csv(seasons: list, league_id:int, verbose:bool=True):
+    data_dict = c.DATA_STRUCTURE
+    seasons.sort()
+    
+    if verbose:
+        print(f'\nStart downloading data for seasons: {seasons[0]}-{seasons[-1]}...\n\n')
+
+    for season in seasons:
+
+        if verbose:
+            print(f'Get season {season}...')
+
+        try:
+            matches = f.get_season_info(league_id, season)
+            save_match_info_in_ds(data_dict, matches)
+        except Exception as err:
+            if verbose:
+                print(f'Something went wrong during season {season}:')
+            print(err)
+        
+        if verbose:
+            print(f'Season {season} done!\n')
+    
+    if verbose:
+        print(f'\nAll data downloaded correctly!\nThe job is done.\n')
+
+    fullfill_minusone_ds(data_dict)
+    df = pd.DataFrame(data_dict)
+    df.to_csv(c.CSV_NAME)
 
 
 def get_season_info(league_id, year):
@@ -78,21 +111,14 @@ def fullfill_minusone_ds(data_dict: dict):
                 data_dict[key].append(-1)
 
 
-# def save_data_dict_as_csv(data_dict: dict, csv_name: str):
-#     df = pd.DataFrame(data_dict)
-#     df.to_csv(f'./tmp_csv/{csv_name}.csv')
-
-
-# def extract_csv_as_df(csv_name: str):
-#     df = pd.read_csv(f'./tmp_csv/{csv_name}.csv')
-#     df.fillna(value=-1, inplace=True)
-#     return df
-
-
-def get_last_match_id(df: pd.DataFrame):
+def get_last_match_id(df: pd.DataFrame, match_to_skip):
     for index, row in df.iterrows():
+        if row['match_id'] == match_to_skip:
+            continue
+
         if row['home_shots_on_goal'] == -1:
             return row['match_id']
+    return False
 
 
 def get_stats_info(match_id):
@@ -126,3 +152,17 @@ def save_stats_info_in_df(df, match_id, stats):
 
     for i, stat in enumerate(away_list):
         df[stat].loc[df['match_id']==match_id] = stats[1]['statistics'][i]['value']
+
+
+def read_csv_from_s3(name: str):
+    s3_client = boto3.client('s3')
+    resposne = s3_client.get_object(Bucket=BUCKET_NAME, Key=name)
+
+    df = pd.read_csv(resposne.get("Body"))
+    return df
+
+
+def write_csv_into_s3(name: str, df: pd.DataFrame):
+    s3 = s3fs.S3FileSystem(anon=False)
+    with s3.open(f'{BUCKET_NAME}/{name}','w') as f:
+        df.to_csv(f)

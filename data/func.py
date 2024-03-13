@@ -1,9 +1,8 @@
 import boto3
-import numpy as np
+from datetime import datetime, timedelta
 from my_secret_key import *
 import pandas as pd
 import requests
-import s3fs
 
 pd.set_option('mode.chained_assignment', None)
 
@@ -111,11 +110,8 @@ def fullfill_minusone_ds(data_dict: dict):
                 data_dict[key].append(-1)
 
 
-def get_last_match_id(df: pd.DataFrame, match_to_skip):
+def get_last_match_id(df: pd.DataFrame):
     for index, row in df.iterrows():
-        if row['match_id'] == match_to_skip:
-            continue
-
         if row['home_shots_on_goal'] == -1:
             return row['match_id']
     return False
@@ -163,6 +159,31 @@ def read_csv_from_s3(name: str):
 
 
 def write_csv_into_s3(name: str, df: pd.DataFrame):
-    s3 = s3fs.S3FileSystem(anon=False)
-    with s3.open(f'{BUCKET_NAME}/{name}','w') as f:
-        df.to_csv(f)
+
+    df.to_csv(f"s3://{BUCKET_NAME}/{name}")
+
+
+def n_days_ago(n: int):
+    now = datetime.today()
+    delay = timedelta(days=n)
+    n_days_ago = now - delay
+
+    return n_days_ago.strftime('%Y-%m-%d')
+
+
+def get_match_ids_from_last_three_days():
+    url = "https://api-football-v1.p.rapidapi.com/v3/fixtures"
+    today = n_days_ago(0)
+    four_days_ago = n_days_ago(4)
+    year = today.year
+
+    querystring = {"league":"39", "season":"2023", "from":four_days_ago, "to":today}
+    headers = {
+        "X-RapidAPI-Key": "593dec4a73msh0b59f1a2ed01ab0p190b44jsnd1a3034279ce",
+        "X-RapidAPI-Host": "api-football-v1.p.rapidapi.com"
+    }
+
+    response = requests.get(url, headers=headers, params=querystring)
+
+    print(response.json())
+

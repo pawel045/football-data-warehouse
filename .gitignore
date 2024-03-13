@@ -1,6 +1,7 @@
 __pycache__
 .idea
-etl/airflow_football_key.ppk
-etl/my_secret_key.py
+data/ec2_s3_football_key.pem
+data/my_secret_key.py
 matches.csv
-boto3test.py
+test
+football_data.csv

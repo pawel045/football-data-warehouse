@@ -1,3 +1,5 @@
+# Functions for connecting with API and corresponding with S3
+
 import boto3
 from datetime import datetime, timedelta
 from my_secret_key import *

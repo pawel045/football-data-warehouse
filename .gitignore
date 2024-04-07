@@ -1,6 +1,6 @@
 __pycache__
 .idea
-data/ec2_s3_football_key.pem
+data/archive/ec2_s3_football_key.pem
 data/my_secret_key.py
 matches.csv
 test

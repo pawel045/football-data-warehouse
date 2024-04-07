@@ -1,3 +1,5 @@
+# Function for connecting with Postgres
+
 import psycopg2
 from my_secret_key import POSTGRES_PASSWORD, POSTGRES_DATABASE_NAME, POSTGRES_USER
 
@@ -129,8 +131,6 @@ def create_match_id(conn):
         new_id = 1
 
     return new_id
-
-
 
 
 def insert_to_match_stats(conn, values):

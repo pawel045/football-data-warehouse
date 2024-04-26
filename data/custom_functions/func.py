@@ -23,7 +23,7 @@ def create_initial_csv(seasons: list, league_id:int, verbose:bool=True):
             print(f'Get season {season}...')
 
         try:
-            matches = f.get_season_info(league_id, season)
+            matches = get_season_info(league_id, season)
             save_match_info_in_ds(data_dict, matches)
         except Exception as err:
             if verbose:

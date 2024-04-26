@@ -1,7 +1,10 @@
 # Function for connecting with Postgres
+import sys
+
+sys.path.append('../')
 
 import psycopg2
-from my_secret_key import POSTGRES_PASSWORD, POSTGRES_DATABASE_NAME, POSTGRES_USER
+from data.custom_functions.my_secret_key import POSTGRES_PASSWORD, POSTGRES_DATABASE_NAME, POSTGRES_USER
 
 
 def create_connection(db_name=POSTGRES_DATABASE_NAME, user=POSTGRES_USER, password=POSTGRES_PASSWORD):
@@ -143,36 +146,4 @@ def insert_to_match_stats(conn, values):
     conn.commit()
 
 
-def percentage_to_float(percentage:str):
-    try:
-        number = int(percentage.replace('%', ''))
-        result = round(float(number/100), 2)
-    except Exception as err:
-        print(err)
 
-    return result
-
-
-# with create_connection() as conn:
-#     get_id(conn, 'league', )
-
-# # Connect to your postgres DB
-# conn = psycopg2.connect(f"dbname=football_db user=postgres password={POSTGRES_PASSWORD}")
-# print(type(conn))
-
-# # Open a cursor to perform database operations
-# cur = conn.cursor()
-
-# # Execute a query
-# sql_check_if_exist = f"select count(*) from football.clubs where club_name='test1'"
-# cur.execute(sql_check_if_exist)
-
-# # Retrieve query results
-# records = cur.fetchall()
-
-# print(records)
-
-# if records[0][0] == 1:
-#     print('TAK')
-# else:
-#     print('NIE')

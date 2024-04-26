@@ -1,12 +1,13 @@
-# This script is use for uploading all already collected data.
+# This script is use for uploading all already collected data to a database.
 # Use it only once.
 
+import custom_functions.func as f
+import custom_functions.postgres_func as pf
 import pandas as pd
-import postgres_func as pf
 
 
 df = pd.read_csv('football_data.csv')
-# df_columns = df.columns
+
 
 with pf.create_connection() as conn:
 
@@ -51,13 +52,13 @@ with pf.create_connection() as conn:
             row['home_fouls'],
             row['home_corner_kick'],
             row['home_offsides'],
-            pf.percentage_to_float(row['home_ball_possession']),
+            f.percentage_to_float(row['home_ball_possession']),
             row['home_yellow_cards'],
             row['home_red_cards'],
             row['home_goalkeeper_saves'],
             row['home_total_passes'],
             row['home_passes_accurate'],
-            pf.percentage_to_float(row['home_passes_percent']),
+            f.percentage_to_float(row['home_passes_percent']),
             row['away_goals_ht'],
             row['away_goals_ft'],
             row['away_shots_on_goal'],
@@ -69,13 +70,13 @@ with pf.create_connection() as conn:
             row['away_fouls'],
             row['away_corner_kick'],
             row['away_offsides'],
-            pf.percentage_to_float(row['away_ball_possession']),
+            f.percentage_to_float(row['away_ball_possession']),
             row['away_yellow_cards'],
             row['away_red_cards'],
             row['away_goalkeeper_saves'],
             row['away_total_passes'],
             row['away_passes_accurate'],
-            pf.percentage_to_float(row['away_passes_percent']),
+            f.percentage_to_float(row['away_passes_percent']),
             row['date']
         )
 

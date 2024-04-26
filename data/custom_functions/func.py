@@ -1,8 +1,9 @@
 # Functions for connecting with API and corresponding with S3
 
 import boto3
+import constants as c
 from datetime import datetime, timedelta
-from my_secret_key import *
+from data.custom_functions.my_secret_key import *
 import pandas as pd
 import requests
 
@@ -173,13 +174,14 @@ def n_days_ago(n: int):
     return n_days_ago.strftime('%Y-%m-%d')
 
 
-def get_match_ids_from_last_three_days():
+def get_match_ids_from_last_three_days(league='Premier League'):
     url = "https://api-football-v1.p.rapidapi.com/v3/fixtures"
     today = n_days_ago(0)
     four_days_ago = n_days_ago(4)
-    year = today.year
 
-    querystring = {"league":"39", "season":"2023", "from":four_days_ago, "to":today}
+    leagues_id = {'Premier League': '39'}
+
+    querystring = {"league":leagues_id[league], "season":"2023", "from":four_days_ago, "to":today}
     headers = {
         "X-RapidAPI-Key": "593dec4a73msh0b59f1a2ed01ab0p190b44jsnd1a3034279ce",
         "X-RapidAPI-Host": "api-football-v1.p.rapidapi.com"
@@ -187,6 +189,14 @@ def get_match_ids_from_last_three_days():
 
     response = requests.get(url, headers=headers, params=querystring)
 
-    print(response.json())
+    return response.json()['response']
 
 
+def percentage_to_float(percentage:str):
+    try:
+        number = int(percentage.replace('%', ''))
+        result = round(float(number/100), 2)
+    except Exception as err:
+        print(err)
+
+    return result

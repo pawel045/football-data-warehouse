@@ -1,6 +1,10 @@
+# This is script for get data from 5 last Premier League's seasons as initial data.
+# The script connect with API, read statistics, transform to DataFrame and save as csv in s3.
+# Becouse API free tier allows to 100 requests per day this script was set up on EC2 instance and ran once at day (cronjob).
+
 import constants as c
 from datetime import datetime
-import func as f
+import data.custom_functions.func as f
 import pandas as pd
 
 
@@ -30,11 +34,6 @@ def run_football_initial_etl(etl_range:int, df: pd.DataFrame, verbose:bool=True)
 
     if verbose:
         print('\nThe data was successfully downloaded\n')
-
-
-def run_football_last_week_etl(df: pd.DataFrame, verbose:bool=True):
-    
-    pass
 
 
 if __name__ == '__main__':
